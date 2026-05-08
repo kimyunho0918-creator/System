@@ -244,7 +244,7 @@
 
     <header>
         <h1>FESTIVAL APP</h1>
-        <button class="btn-admin-icon" onclick="openAdminPanel()">⚙️</button>
+        <button id="adminBtn" class="btn-admin-icon" onclick="openAdminPanel()" style="display: none;">⚙️</button>
     </header>
 
     <div class="content-area">
@@ -310,11 +310,8 @@
             { id: 'game_slot', name: '🎰 슬롯머신', isSlot: true }
         ];
 
-        // =========================================================================
-        // 🌟 [상품 설정 구역 - 품절 처리하는 곳] 🌟
+        // 🌟 상품 설정 🌟
         // sellStatus: 1 (정상 판매중) / sellStatus: 0 (강제 품절)
-        // 🚨 축제 중에 상품이 다 떨어지면, 여기의 1을 0으로만 바꿔주세요! 🚨
-        // =========================================================================
         const SHOP_ITEMS = [
             { id: 'item1', name: '🍬 마이쮸', price: 500, stock: 5, sellStatus: 1 },         
             { id: 'item2', name: '🐻 하리보 젤리', price: 800, stock: 3, sellStatus: 1 },       
@@ -322,7 +319,6 @@
             { id: 'item4', name: '🍦 아이스크림', price: 3000, stock: 1, sellStatus: 1 },        
             { id: 'item6', name: '🎰 슬롯머신 이용권', price: 0, stock: null, sellStatus: 1, isVariablePrice: true } 
         ];
-        // =========================================================================
 
         // ==========================================
         // 🌟 [커스텀 모달 제어 로직] 🌟
@@ -406,14 +402,20 @@
         // 🌟 [최고 관리자 모드 (Admin) 로직] 🌟
         // ==========================================
         function openAdminPanel() {
-            customPrompt(`최고 관리자(부장) 전용 메뉴입니다.<br>비밀번호 4자리를 입력하세요.`, (pwd) => {
-                if(pwd === null) return;
-                if(pwd === '7777') { 
-                    document.getElementById('adminOverlay').classList.add('active');
-                } else {
-                    customAlert('최고 관리자 권한이 없습니다.', 'error');
-                }
-            });
+            // 🌟 30109 김윤호 계정이면 비밀번호 없이 즉시 패널 열림 🌟
+            if (currentUser && currentUser.isAdmin) {
+                document.getElementById('adminOverlay').classList.add('active');
+            } else {
+                // (일반적인 방식의 접근 - 버튼이 숨겨져 있으므로 사실상 발동 안됨)
+                customPrompt(`최고 관리자(부장) 전용 메뉴입니다.<br>비밀번호 4자리를 입력하세요.`, (pwd) => {
+                    if(pwd === null) return;
+                    if(pwd === '7777') { 
+                        document.getElementById('adminOverlay').classList.add('active');
+                    } else {
+                        customAlert('최고 관리자 권한이 없습니다.', 'error');
+                    }
+                });
+            }
         }
 
         function closeAdminPanel() {
@@ -471,6 +473,9 @@
             const name = document.getElementById('stuName').value.trim();
             if(!id || !name) return customAlert('학번과 이름을 모두 입력해주세요.', 'error');
 
+            // 🌟 최고관리자(부장) 계정 체크 로직 🌟
+            const isAdminAccount = (id === '30109' && name === '김윤호');
+
             const savedUser = localStorage.getItem('festivalUser');
             const savedStock = localStorage.getItem('festivalStock');
             
@@ -478,6 +483,7 @@
                 const parsedUser = JSON.parse(savedUser);
                 if (parsedUser.studentId === id) {
                     currentUser = parsedUser;
+                    currentUser.isAdmin = isAdminAccount; // 권한 갱신
                     if(!currentUser.inventory) currentUser.inventory = []; 
                     
                     if(savedStock) {
@@ -486,11 +492,11 @@
                         initLocalStock();
                     }
                 } else {
-                    currentUser = { studentId: id, name: name, points: 0, inventory: [] };
+                    currentUser = { studentId: id, name: name, points: 0, inventory: [], isAdmin: isAdminAccount };
                     initLocalStock();
                 }
             } else {
-                currentUser = { studentId: id, name: name, points: 0, inventory: [] };
+                currentUser = { studentId: id, name: name, points: 0, inventory: [], isAdmin: isAdminAccount };
                 initLocalStock();
             }
 
@@ -517,9 +523,16 @@
         }
 
         function updateUI() {
-            document.getElementById('userNameDisplay').innerText = '[' + currentUser.studentId + '] ' + currentUser.name;
+            // 관리자일 경우 뱃지 추가
+            const adminBadge = currentUser.isAdmin ? ' <span style="color:#ff3366; font-size:0.7em;">(최고관리자)</span>' : '';
+            document.getElementById('userNameDisplay').innerHTML = `[${currentUser.studentId}] ${currentUser.name}${adminBadge}`;
+            
             document.getElementById('pointDisplay').innerText = currentUser.points;
             document.getElementById('shopPointDisplay').innerText = currentUser.points;
+            
+            // 🌟 최고관리자 계정이면 톱니바퀴 버튼(⚙️) 표시, 아니면 숨김 🌟
+            document.getElementById('adminBtn').style.display = currentUser.isAdmin ? 'block' : 'none';
+
             renderInventory(); 
         }
 
@@ -605,7 +618,6 @@
                 itemDiv.className = 'shop-item';
                 
                 const currentStock = localStock[item.id];
-                // 🌟 sellStatus 값(1 또는 0)을 검사하여 품절 여부 판단 🌟
                 const isOutOfStock = (item.sellStatus === 0) || (currentStock !== undefined && currentStock <= 0);
 
                 if(isOutOfStock) itemDiv.classList.add('sold-out');

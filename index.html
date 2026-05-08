@@ -312,15 +312,15 @@
 
         // =========================================================================
         // 🌟 [상품 설정 구역 - 품절 처리하는 곳] 🌟
-        // isAvailable: true (판매중) / isAvailable: false (품절)
-        // 🚨 축제 중에 상품이 다 떨어지면, 여기의 true를 false로만 바꿔주세요! 🚨
+        // sellStatus: 1 (정상 판매중) / sellStatus: 0 (강제 품절)
+        // 🚨 축제 중에 상품이 다 떨어지면, 여기의 1을 0으로만 바꿔주세요! 🚨
         // =========================================================================
         const SHOP_ITEMS = [
-            { id: 'item1', name: '🍬 마이쮸', price: 500, stock: 5, isAvailable: true },         
-            { id: 'item2', name: '🐻 하리보 젤리', price: 800, stock: 3, isAvailable: true },       
-            { id: 'item3', name: '🧃 탄산 음료수', price: 1500, stock: 2, isAvailable: true },       
-            { id: 'item4', name: '🍦 아이스크림', price: 3000, stock: 1, isAvailable: true },        
-            { id: 'item6', name: '🎰 슬롯머신 이용권', price: 0, stock: null, isAvailable: true, isVariablePrice: true } 
+            { id: 'item1', name: '🍬 마이쮸', price: 500, stock: 5, sellStatus: 1 },         
+            { id: 'item2', name: '🐻 하리보 젤리', price: 800, stock: 3, sellStatus: 1 },       
+            { id: 'item3', name: '🧃 탄산 음료수', price: 1500, stock: 2, sellStatus: 1 },       
+            { id: 'item4', name: '🍦 아이스크림', price: 3000, stock: 1, sellStatus: 1 },        
+            { id: 'item6', name: '🎰 슬롯머신 이용권', price: 0, stock: null, sellStatus: 1, isVariablePrice: true } 
         ];
         // =========================================================================
 
@@ -605,8 +605,8 @@
                 itemDiv.className = 'shop-item';
                 
                 const currentStock = localStock[item.id];
-                // isAvailable 검사 추가! (false면 품절)
-                const isOutOfStock = !item.isAvailable || (currentStock !== undefined && currentStock <= 0);
+                // 🌟 sellStatus 값(1 또는 0)을 검사하여 품절 여부 판단 🌟
+                const isOutOfStock = (item.sellStatus === 0) || (currentStock !== undefined && currentStock <= 0);
 
                 if(isOutOfStock) itemDiv.classList.add('sold-out');
 
@@ -619,10 +619,10 @@
                     infoHtml += `<div class="price">${item.price} P</div>`;
                 }
 
-                if (currentStock !== undefined && item.isAvailable) {
+                if (currentStock !== undefined && item.sellStatus === 1) {
                     const stockClass = currentStock <= 1 ? 'stock-info low' : 'stock-info';
                     infoHtml += `<div class="${stockClass}">남은 수량: ${currentStock}개</div>`;
-                } else if (item.stock === null && item.isAvailable) {
+                } else if (item.stock === null && item.sellStatus === 1) {
                     infoHtml += `<div class="stock-info">무제한 구매 가능</div>`;
                 }
 

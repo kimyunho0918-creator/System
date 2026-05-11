@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>동아리 페스티벌 앱</title>
+    <!-- 디자인 파일 연결 -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,7 +15,6 @@
             <div class="modal-title" id="modalTitle">알림</div>
             <div class="modal-message" id="modalMessage">메시지</div>
             
-            <!-- 스크롤(슬라이더) 영역 -->
             <div id="modalSliderWrap" style="display:none;">
                 <div id="modalSliderValue">1개</div>
                 <input type="range" id="modalSlider" min="1" max="10" value="1">
@@ -32,7 +32,7 @@
     <div class="modal-overlay" id="adminOverlay">
         <div class="modal-box" style="border-color: rgba(255,51,102,0.5); box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 15px rgba(255,51,102,0.1);">
             <div class="modal-title error" style="margin-bottom: 5px;">🛠️ 최고 관리자 패널</div>
-            <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:20px;">이 기기(로컬)의 데이터를 강제로 제어합니다.</p>
+            <p style="color:var(--text-dim); font-size:0.8rem; margin-bottom:20px;">데이터 강제 제어 시스템</p>
             
             <button class="modal-btn confirm danger" style="width:100%; margin-bottom:12px;" onclick="adminResetUser()">⚠️ 계정 완전 초기화 (로그아웃)</button>
             <button class="modal-btn confirm" style="width:100%; margin-bottom:12px;" onclick="adminResetStock()">📦 전체 상품 개인재고 복구</button>
@@ -46,9 +46,9 @@
     <div id="loginOverlay">
         <div class="card" style="max-width: 400px; margin: auto; border-color: rgba(0,229,255,0.12);">
             <h1 style="font-family: 'Orbitron'; color: #00e5ff; margin-bottom: 30px; text-shadow: 0 0 8px rgba(0,229,255,0.4), 0 0 30px rgba(0,229,255,0.1);">FESTIVAL WALLET</h1>
-            <input type="number" id="stuId" placeholder="학번 (예: 30101)">
-            <input type="text" id="stuName" placeholder="이름">
-            <button class="btn-primary" onclick="login()">접속하기</button>
+            <input type="number" id="stuId" placeholder="학번 (예: 30101)" onkeypress="handleLoginEnter(event)">
+            <input type="text" id="stuName" placeholder="이름" onkeypress="handleLoginEnter(event)">
+            <button class="btn-primary" id="loginBtn" onclick="login()">접속하기</button>
         </div>
     </div>
 
@@ -64,8 +64,6 @@
                 <h3 id="userNameDisplay"></h3>
                 <h3>현재 보유 포인트</h3>
                 <span class="point-text" id="pointDisplay">0</span>
-                
-                <!-- 🌟 추가된 로그아웃 버튼 🌟 -->
                 <button onclick="logout()" style="background: #1e1e2a; border: 1px solid #333; padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; color: #9999bb; margin-top: 15px; width: auto; box-shadow: none;">🔓 로그아웃</button>
             </div>
             <p style="text-align: center; font-size: 0.85rem; color: #888;">하단의 메뉴 탭을 눌러 이동하세요.</p>
@@ -78,11 +76,11 @@
                 <select id="gameSelect" onchange="updateTierOptions()"></select>
                 <select id="tierSelect"></select>
                 <div id="slotPointInputWrap" style="display:none;">
-                    <p style="font-size:0.82rem; color:#9999bb; margin: 0 0 8px; text-align:left;">🎰 슬롯머신 획득 포인트 직접 입력 (최대 5,000P)</p>
-                    <input type="number" id="slotPointInput" placeholder="획득 포인트 입력 (1 ~ 5000)" min="1" max="5000">
+                    <p style="font-size:0.82rem; color:#9999bb; margin: 0 0 8px; text-align:left;">🎰 직접 획득 포인트 입력 (최대 5,000P)</p>
+                    <input type="number" id="slotPointInput" placeholder="획득 포인트 입력 (1 ~ 5000)" min="1" max="5000" onkeypress="handleGamePointEnter(event)">
                 </div>
-                <input type="password" id="gameAuthInput" placeholder="운영자 비밀번호">
-                <button class="btn-game" onclick="giveGamePoints()">포인트 지급</button>
+                <input type="password" id="gameAuthInput" placeholder="운영자 비밀번호" onkeypress="handleGamePointEnter(event)">
+                <button class="btn-game" id="gameSubmitBtn" onclick="giveGamePoints()">포인트 지급</button>
             </div>
         </div>
 
@@ -109,6 +107,7 @@
         <div class="nav-item" onclick="switchTab('inv')" id="nav-inv">🎒 보관함</div>
     </div>
 
+    <!-- 자바스크립트 파일 2개 순서대로 연결 -->
     <script src="config.js"></script>
     <script src="script.js"></script>
 </body>

@@ -4,214 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>동아리 페스티벌 앱</title>
-    <style>
-        /* 블랙 + 은은한 네온 테마 */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Noto+Sans+KR:wght@400;700&display=swap');
-
-        :root {
-            --neon-cyan: #00e5ff;
-            --neon-green: #00ff88;
-            --neon-purple: #b44fff;
-            --neon-orange: #ff9900;
-            --neon-pink: #ff3366;
-            --bg-base: #080810;
-            --bg-surface: #101018;
-            --bg-elevated: #14141e;
-            --bg-card: #111119;
-            --border-dim: #1e1e2a;
-            --border-mid: #252535;
-            --text-dim: #666680;
-            --text-muted: #9999bb;
-        }
-
-        * { box-sizing: border-box; font-family: 'Noto Sans KR', sans-serif; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-base);
-            color: #e0e0f0;
-            height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-
-        /* 헤더 — 하단 네온 라인 */
-        header {
-            background: var(--bg-surface);
-            padding: 15px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-dim);
-            box-shadow: 0 1px 0 rgba(0, 229, 255, 0.08), 0 4px 20px rgba(0,0,0,0.6);
-            z-index: 10;
-            display: flex; align-items: center; justify-content: center;
-            height: 60px;
-            position: relative;
-        }
-        header::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 10%; right: 10%; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0,229,255,0.3), transparent);
-        }
-        header h1 {
-            margin: 0;
-            font-family: 'Orbitron', sans-serif;
-            color: var(--neon-cyan);
-            font-size: 1.3rem;
-            letter-spacing: 0.12em;
-            text-shadow:
-                0 0 6px rgba(0, 229, 255, 0.5),
-                0 0 20px rgba(0, 229, 255, 0.15);
-        }
-
-        /* 🌟 관리자 모드 버튼 🌟 */
-        .btn-admin-icon {
-            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
-            background: transparent; border: none; font-size: 1.5rem; color: var(--text-dim);
-            padding: 5px; box-shadow: none; width: auto; margin: 0; cursor: pointer;
-        }
-        .btn-admin-icon:active { transform: translateY(-50%) scale(0.9); }
-
-        .content-area { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 30px; }
-
-        /* 하단 네비게이션 */
-        .bottom-nav {
-            background: var(--bg-surface);
-            display: flex;
-            border-top: 1px solid var(--border-dim);
-            box-shadow: 0 -1px 0 rgba(0, 229, 255, 0.05), 0 -6px 24px rgba(0,0,0,0.5);
-            z-index: 10;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        .nav-item {
-            flex: 1; padding: 12px 0;
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 0.8rem; font-weight: bold;
-            cursor: pointer; transition: 0.25s;
-        }
-        .nav-item.active {
-            color: var(--neon-cyan);
-            text-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
-            border-top: 1px solid rgba(0, 229, 255, 0.5);
-            margin-top: -1px;
-            background: linear-gradient(to bottom, rgba(0,229,255,0.04), transparent);
-        }
-
-        /* 카드 */
-        .card {
-            background: var(--bg-card);
-            width: 100%; padding: 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border-dim);
-            box-shadow: 0 0 0 1px rgba(0,229,255,0.03), inset 0 1px 0 rgba(255,255,255,0.03);
-            text-align: center; margin-bottom: 20px;
-        }
-        h3 { color: var(--text-muted); font-size: 1rem; margin-top: 0; margin-bottom: 10px; font-weight: normal; }
-
-        /* 포인트 숫자 */
-        .point-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem; font-weight: 700;
-            color: var(--neon-green);
-            text-shadow:
-                0 0 8px rgba(0, 255, 136, 0.45),
-                0 0 24px rgba(0, 255, 136, 0.12);
-            margin: 10px 0; display: block;
-        }
-
-        /* 입력 요소 */
-        input, select {
-            width: 100%; padding: 14px; margin-bottom: 12px;
-            border: 1px solid var(--border-mid);
-            border-radius: 8px;
-            background: #0c0c16;
-            color: #e0e0f0; font-size: 1rem;
-            outline: none; appearance: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        input:focus, select:focus {
-            border-color: rgba(0, 229, 255, 0.4);
-            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.06);
-        }
-
-        /* 버튼 */
-        button {
-            width: 100%; padding: 14px;
-            border: none; border-radius: 8px;
-            font-size: 1rem; font-weight: 700;
-            color: #fff; cursor: pointer; transition: 0.2s;
-        }
-        button:active { transform: scale(0.97); opacity: 0.9; }
-
-        .btn-primary { background: linear-gradient(135deg, #00c8e8 0%, #0066ee 100%); box-shadow: 0 0 12px rgba(0, 200, 232, 0.2); margin-top: 10px; }
-        .btn-game { background: linear-gradient(135deg, #9000e8 0%, #3300cc 100%); box-shadow: 0 0 12px rgba(144, 0, 232, 0.2); }
-        .btn-buy { background: linear-gradient(135deg, #e08800 0%, #e04400 100%); box-shadow: 0 0 10px rgba(224, 136, 0, 0.2); margin: 0; padding: 10px 16px; width: auto; font-size: 0.95rem; }
-
-        .view-section { display: none; animation: fadeIn 0.3s; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 상점 리스트 */
-        .shop-list { display: flex; flex-direction: column; gap: 12px; }
-        .shop-item {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-dim);
-            border-radius: 12px; padding: 15px;
-            display: flex; align-items: center; justify-content: space-between; text-align: left;
-            transition: border-color 0.2s;
-        }
-        .shop-item:hover { border-color: var(--border-mid); }
-        .shop-item-info { flex: 1; padding-right: 10px; }
-        .shop-item-info .item-name { font-weight: bold; color: #dde; font-size: 1.05rem; line-height: 1.3; }
-        .shop-item-info .price { color: var(--neon-green); font-family: 'Orbitron'; font-weight: bold; margin-top: 5px; font-size: 0.95rem; text-shadow: 0 0 6px rgba(0, 255, 136, 0.3); }
-        .shop-item-info .price.variable { color: #ffcc00; font-family: 'Noto Sans KR'; font-size: 0.8rem; text-shadow: none; }
-        .shop-item-info .stock-info { font-size: 0.8rem; color: var(--text-dim); margin-top: 4px; }
-        .shop-item-info .stock-info.low { color: var(--neon-orange); text-shadow: 0 0 5px rgba(255,153,0,0.3); }
-        .shop-item.sold-out { opacity: 0.4; filter: grayscale(100%); pointer-events: none; }
-        .sold-out-badge { color: var(--neon-pink); font-weight: bold; text-align: center; padding: 10px; border: 1px solid rgba(255, 51, 102, 0.35); border-radius: 8px; text-shadow: 0 0 6px rgba(255,51,102,0.3); }
-
-        /* 보관함 리스트 */
-        .inventory-list { display: flex; flex-direction: column; gap: 10px; }
-        .inv-item { background: var(--bg-elevated); border: 1px solid var(--border-dim); border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .inv-item-name { font-weight: bold; color: #dde; line-height: 1.4; }
-        .btn-use { background: rgba(255, 51, 102, 0.85); box-shadow: 0 0 8px rgba(255,51,102,0.2); padding: 8px 15px; border-radius: 6px; font-size: 0.9rem; margin: 0; width: auto; }
-
-        /* 로그인 오버레이 */
-        #loginOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-base); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px; }
-
-        /* 커스텀 모달 오버레이 */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 8, 0.82); backdrop-filter: blur(6px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px; }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-        
-        #adminOverlay { z-index: 1500; } /* 관리자 패널 순서 */
-        
-        .modal-box { background: var(--bg-card); border: 1px solid var(--border-mid); border-radius: 16px; width: 100%; max-width: 320px; padding: 25px 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,229,255,0.05); transform: translateY(20px); transition: all 0.3s ease; }
-        .modal-overlay.active .modal-box { transform: translateY(0); }
-        .modal-title { font-family: 'Orbitron', 'Noto Sans KR', sans-serif; font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; }
-        .modal-title.error { color: var(--neon-pink); text-shadow: 0 0 8px rgba(255,51,102,0.35); }
-        .modal-title.success { color: var(--neon-green); text-shadow: 0 0 8px rgba(0,255,136,0.35); }
-        .modal-title.info { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,229,255,0.35); }
-        .modal-message { color: #cccce0; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5; word-break: keep-all; }
-        .modal-input { display: none; width: 100%; text-align: center; font-size: 1.2rem; letter-spacing: 2px; margin-bottom: 20px; background: #080812; border-color: #333; }
-        .modal-input:focus { border-color: rgba(255,51,102,0.4); box-shadow: 0 0 0 3px rgba(255,51,102,0.08); }
-        .modal-buttons { display: flex; gap: 10px; }
-        .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; margin: 0; }
-        .modal-btn.cancel { background: #1e1e2a; border: 1px solid #333; }
-        .modal-btn.confirm { background: linear-gradient(135deg, #00c8e8 0%, #0066ee 100%); box-shadow: 0 0 10px rgba(0,200,232,0.15); }
-        .modal-btn.confirm.danger { background: linear-gradient(135deg, #e82255 0%, #aa0022 100%); box-shadow: 0 0 10px rgba(232,34,85,0.15); }
-
-        /* 스크롤바 */
-        .content-area::-webkit-scrollbar { width: 4px; }
-        .content-area::-webkit-scrollbar-track { background: transparent; }
-        .content-area::-webkit-scrollbar-thumb { background: rgba(0,229,255,0.15); border-radius: 4px; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- 커스텀 모달 오버레이 -->
     <div class="modal-overlay" id="customModal">
         <div class="modal-box">
             <div class="modal-title" id="modalTitle">알림</div>
             <div class="modal-message" id="modalMessage">메시지</div>
+            
+            <!-- 스크롤(슬라이더) 영역 -->
+            <div id="modalSliderWrap" style="display:none;">
+                <div id="modalSliderValue">1개</div>
+                <input type="range" id="modalSlider" min="1" max="10" value="1">
+            </div>
+
             <input type="text" id="modalInput" class="modal-input" placeholder="입력">
             <div class="modal-buttons">
                 <button class="modal-btn cancel" id="modalCancelBtn">취소</button>
@@ -220,6 +28,7 @@
         </div>
     </div>
 
+    <!-- 관리자 패널 오버레이 -->
     <div class="modal-overlay" id="adminOverlay">
         <div class="modal-box" style="border-color: rgba(255,51,102,0.5); box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 15px rgba(255,51,102,0.1);">
             <div class="modal-title error" style="margin-bottom: 5px;">🛠️ 최고 관리자 패널</div>
@@ -233,6 +42,7 @@
         </div>
     </div>
 
+    <!-- 로그인 오버레이 -->
     <div id="loginOverlay">
         <div class="card" style="max-width: 400px; margin: auto; border-color: rgba(0,229,255,0.12);">
             <h1 style="font-family: 'Orbitron'; color: #00e5ff; margin-bottom: 30px; text-shadow: 0 0 8px rgba(0,229,255,0.4), 0 0 30px rgba(0,229,255,0.1);">FESTIVAL WALLET</h1>
@@ -248,15 +58,20 @@
     </header>
 
     <div class="content-area">
+        <!-- 🏠 홈 화면 -->
         <div id="view-home" class="view-section active">
             <div class="card">
                 <h3 id="userNameDisplay"></h3>
                 <h3>현재 보유 포인트</h3>
                 <span class="point-text" id="pointDisplay">0</span>
+                
+                <!-- 🌟 추가된 로그아웃 버튼 🌟 -->
+                <button onclick="logout()" style="background: #1e1e2a; border: 1px solid #333; padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; color: #9999bb; margin-top: 15px; width: auto; box-shadow: none;">🔓 로그아웃</button>
             </div>
             <p style="text-align: center; font-size: 0.85rem; color: #888;">하단의 메뉴 탭을 눌러 이동하세요.</p>
         </div>
 
+        <!-- 🎮 게임/점수 입력 화면 -->
         <div id="view-game" class="view-section">
             <div class="card" style="border-color: rgba(144,0,232,0.3);">
                 <h3 style="color: #b44fff; font-weight: bold; border-bottom: 1px dashed #252535; padding-bottom: 10px; text-shadow: 0 0 6px rgba(180,79,255,0.3);">🎮 점수 획득 (운영자 전용)</h3>
@@ -271,12 +86,14 @@
             </div>
         </div>
 
+        <!-- 🛒 상점 화면 -->
         <div id="view-shop" class="view-section">
             <h3 style="text-align: center; color: #ff9900;">상점 (보유: <span id="shopPointDisplay" style="color:#00ff88;">0</span>P)</h3>
             <p style="text-align: center; font-size: 0.8rem; color: #888;">원하시는 상품을 구매하시면 보관함으로 이동합니다.</p>
             <div class="shop-list" id="shopList"></div>
         </div>
 
+        <!-- 🎒 보관함 화면 -->
         <div id="view-inv" class="view-section">
             <h3 style="text-align: center; color: #00e5ff;">내 보관함</h3>
             <p style="text-align: center; font-size: 0.8rem; color: #888;">상품 수령 시 운영자에게 보여주고 '사용'을 눌러주세요.</p>
@@ -284,6 +101,7 @@
         </div>
     </div>
 
+    <!-- 하단 네비게이션 탭 -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home')" id="nav-home">🏠 홈</div>
         <div class="nav-item" onclick="switchTab('game')" id="nav-game">🎮 점수입력</div>
@@ -291,507 +109,7 @@
         <div class="nav-item" onclick="switchTab('inv')" id="nav-inv">🎒 보관함</div>
     </div>
 
-    <script>
-        // ==========================================
-        // 🛠️ [기본 설정 구역] 🛠️
-        // ==========================================
-        const OPERATOR_CODES = {
-            '1004': '운영팀1',
-            '2004': '운영팀2',
-            '3004': '운영팀3',
-            '7777': '부장(최고관리자)'
-        };
-
-        const GAMES = [
-            { id: 'game1', name: '⌨️ 가게 운영 시뮬레이션 with 커리어 엑스포' },
-            { id: 'game2', name: '💡 역전 재판 with 인플루언스' },
-            { id: 'game3', name: '🎯 모의 주식' },
-            { id: 'game4', name: '🏃 미니 올림픽' },
-            { id: 'game_slot', name: '🎰 슬롯머신', isSlot: true }
-        ];
-
-        // 🌟 상품 설정 🌟
-        const SHOP_ITEMS = [
-            { id: 'item1', name: '🍬 마이쮸', price: 500, stock: 5, sellStatus: 1 },         
-            { id: 'item2', name: '🐻 하리보 젤리', price: 800, stock: 3, sellStatus: 1 },       
-            { id: 'item3', name: '🧃 탄산 음료수', price: 1500, stock: 2, sellStatus: 1 },       
-            { id: 'item4', name: '🍦 아이스크림', price: 3000, stock: 1, sellStatus: 1 },        
-            { id: 'item6', name: '🎰 슬롯머신 이용권', price: 0, stock: null, sellStatus: 1, isVariablePrice: true } 
-        ];
-
-        // ==========================================
-        // 🌟 [커스텀 모달 제어 로직] 🌟
-        // ==========================================
-        function closeCustomModal() {
-            document.getElementById('customModal').classList.remove('active');
-            document.getElementById('modalInput').value = ''; 
-        }
-
-        function customAlert(message, type = 'info') {
-            const titles = { error: '⚠️ 오류 발생', success: '✅ 처리 완료', info: '💡 알림' };
-            const confirmBtn = document.getElementById('modalConfirmBtn');
-            
-            document.getElementById('modalTitle').className = 'modal-title ' + type;
-            document.getElementById('modalTitle').innerText = titles[type];
-            document.getElementById('modalMessage').innerHTML = message;
-            
-            document.getElementById('modalInput').style.display = 'none';
-            document.getElementById('modalCancelBtn').style.display = 'none';
-            
-            confirmBtn.className = 'modal-btn confirm';
-            confirmBtn.onclick = closeCustomModal;
-            
-            document.getElementById('customModal').classList.add('active');
-        }
-
-        function customConfirm(message, callback) {
-            const confirmBtn = document.getElementById('modalConfirmBtn');
-            
-            document.getElementById('modalTitle').className = 'modal-title info';
-            document.getElementById('modalTitle').innerText = '❓ 확인';
-            document.getElementById('modalMessage').innerHTML = message;
-            
-            document.getElementById('modalInput').style.display = 'none';
-            document.getElementById('modalCancelBtn').style.display = 'block';
-            
-            confirmBtn.className = 'modal-btn confirm';
-            
-            document.getElementById('modalCancelBtn').onclick = () => {
-                closeCustomModal();
-                if(callback) callback(false);
-            };
-            confirmBtn.onclick = () => {
-                closeCustomModal();
-                if(callback) callback(true);
-            };
-            
-            document.getElementById('customModal').classList.add('active');
-        }
-
-        function customPrompt(message, callback, inputType = 'password', placeholder = '비밀번호 입력') {
-            const inputElem = document.getElementById('modalInput');
-            const confirmBtn = document.getElementById('modalConfirmBtn');
-            
-            document.getElementById('modalTitle').className = 'modal-title ' + (inputType === 'password' ? 'error' : 'info');
-            document.getElementById('modalTitle').innerText = inputType === 'password' ? '🔐 운영자 인증' : '💸 수량/금액 입력';
-            document.getElementById('modalMessage').innerHTML = message;
-            
-            inputElem.type = inputType;
-            inputElem.placeholder = placeholder;
-            inputElem.style.display = 'block';
-            document.getElementById('modalCancelBtn').style.display = 'block';
-            
-            confirmBtn.className = 'modal-btn confirm ' + (inputType === 'password' ? 'danger' : ''); 
-            
-            document.getElementById('modalCancelBtn').onclick = () => {
-                closeCustomModal();
-                if(callback) callback(null);
-            };
-            confirmBtn.onclick = () => {
-                const val = inputElem.value;
-                closeCustomModal();
-                if(callback) callback(val);
-            };
-            
-            document.getElementById('customModal').classList.add('active');
-            setTimeout(() => inputElem.focus(), 100);
-        }
-
-        // ==========================================
-        // 🌟 [최고 관리자 모드 (Admin) 로직] 🌟
-        // ==========================================
-        function openAdminPanel() {
-            if (currentUser && currentUser.isAdmin) {
-                document.getElementById('adminOverlay').classList.add('active');
-            } else {
-                customPrompt(`최고 관리자(부장) 전용 메뉴입니다.<br>비밀번호 4자리를 입력하세요.`, (pwd) => {
-                    if(pwd === null) return;
-                    if(pwd === '7777') { 
-                        document.getElementById('adminOverlay').classList.add('active');
-                    } else {
-                        customAlert('최고 관리자 권한이 없습니다.', 'error');
-                    }
-                });
-            }
-        }
-
-        function closeAdminPanel() {
-            document.getElementById('adminOverlay').classList.remove('active');
-        }
-
-        function adminResetUser() {
-            customConfirm('현재 기기의 모든 학생 데이터와 보관함을 지우고 완전 초기화하시겠습니까?<br><span style="color:#ff3366; font-size:0.85rem;">(복구 불가능)</span>', (ok) => {
-                if(ok) {
-                    localStorage.removeItem('festivalUser');
-                    location.reload(); 
-                }
-            });
-        }
-
-        function adminResetStock() {
-            customConfirm('이 기기의 모든 상품 개인 재고를 초기 횟수로 복구하시겠습니까?', (ok) => {
-                if(ok) {
-                    initLocalStock();
-                    renderShop();
-                    saveData();
-                    closeAdminPanel();
-                    customAlert('재고가 완벽하게 복구되었습니다.', 'success');
-                }
-            });
-        }
-
-        function adminAdjustPoints() {
-            customPrompt('부여할 포인트를 입력하세요.<br><span style="color:#aaa; font-size:0.8rem;">(차감 시 숫자 앞에 - 를 붙이세요)</span>', (val) => {
-                if(val === null) return;
-                const pts = parseInt(val);
-                if(isNaN(pts)) return customAlert('올바른 숫자를 입력해주세요.', 'error');
-
-                currentUser.points += pts;
-                saveData();
-                updateUI();
-                closeAdminPanel();
-                customAlert(`성공적으로 <b>${pts}P</b>가 강제 적용되었습니다.`, 'success');
-            }, 'number', '포인트 조작');
-        }
-
-        // ==========================================
-        // 메인 비즈니스 로직
-        // ==========================================
-        let currentUser = null;
-        let localStock = {}; 
-        let currentGroupedInventory = []; // 🌟 그룹화된 보관함 데이터를 담을 배열
-
-        window.onload = () => {
-            initGameOptions();
-            document.getElementById('loginOverlay').style.display = 'flex';
-        };
-
-        function login() {
-            const id = document.getElementById('stuId').value.trim();
-            const name = document.getElementById('stuName').value.trim();
-            if(!id || !name) return customAlert('학번과 이름을 모두 입력해주세요.', 'error');
-
-            const isAdminAccount = (id === '30109' && name === '김윤호');
-
-            const savedUser = localStorage.getItem('festivalUser');
-            const savedStock = localStorage.getItem('festivalStock');
-            
-            if (savedUser) {
-                const parsedUser = JSON.parse(savedUser);
-                if (parsedUser.studentId === id) {
-                    currentUser = parsedUser;
-                    currentUser.isAdmin = isAdminAccount; 
-                    if(!currentUser.inventory) currentUser.inventory = []; 
-                    
-                    if(savedStock) {
-                        localStock = JSON.parse(savedStock);
-                    } else {
-                        initLocalStock();
-                    }
-                } else {
-                    currentUser = { studentId: id, name: name, points: 0, inventory: [], isAdmin: isAdminAccount };
-                    initLocalStock();
-                }
-            } else {
-                currentUser = { studentId: id, name: name, points: 0, inventory: [], isAdmin: isAdminAccount };
-                initLocalStock();
-            }
-
-            saveData();
-            renderShop(); 
-            document.getElementById('loginOverlay').style.display = 'none';
-            updateUI();
-        }
-
-        function initLocalStock() {
-            localStock = {};
-            SHOP_ITEMS.forEach(item => {
-                if(item.stock !== null) {
-                    localStock[item.id] = item.stock;
-                }
-            });
-            localStorage.setItem('festivalStock', JSON.stringify(localStock));
-        }
-
-        function saveData() {
-            localStorage.setItem('festivalUser', JSON.stringify(currentUser));
-            localStorage.setItem('festivalStock', JSON.stringify(localStock));
-            updateUI();
-        }
-
-        function updateUI() {
-            const adminBadge = currentUser.isAdmin ? ' <span style="color:#ff3366; font-size:0.7em;">(최고관리자)</span>' : '';
-            document.getElementById('userNameDisplay').innerHTML = `[${currentUser.studentId}] ${currentUser.name}${adminBadge}`;
-            
-            document.getElementById('pointDisplay').innerText = currentUser.points;
-            document.getElementById('shopPointDisplay').innerText = currentUser.points;
-            
-            document.getElementById('adminBtn').style.display = currentUser.isAdmin ? 'block' : 'none';
-
-            renderInventory(); 
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById('view-' + tabName).classList.add('active');
-            document.getElementById('nav-' + tabName).classList.add('active');
-            document.getElementById('gameAuthInput').value = '';
-        }
-
-        // --- 🎮 게임 점수 관련 ---
-        function initGameOptions() {
-            const gameSelect = document.getElementById('gameSelect');
-            GAMES.forEach(game => {
-                let opt = document.createElement('option');
-                opt.value = game.id;
-                opt.innerText = game.name;
-                gameSelect.appendChild(opt);
-            });
-            updateTierOptions();
-        }
-
-        function updateTierOptions() {
-            const gameId = document.getElementById('gameSelect').value;
-            const game = GAMES.find(g => g.id === gameId);
-            const tierSelect = document.getElementById('tierSelect');
-            const slotWrap = document.getElementById('slotPointInputWrap');
-            const slotInput = document.getElementById('slotPointInput');
-
-            tierSelect.innerHTML = '';
-
-            if (game && game.isSlot) {
-                tierSelect.style.display = 'none';
-                slotWrap.style.display = 'block';
-                slotInput.value = '';
-            } else {
-                tierSelect.style.display = 'block';
-                slotWrap.style.display = 'none';
-                for(let i = 1; i <= 10; i++) {
-                    let points = i * 100;
-                    let opt = document.createElement('option');
-                    opt.value = points;
-                    opt.innerText = i + '단계 성공 (+ ' + points + 'P)';
-                    tierSelect.appendChild(opt);
-                }
-            }
-        }
-
-        function giveGamePoints() {
-            const gameId = document.getElementById('gameSelect').value;
-            const game = GAMES.find(g => g.id === gameId);
-            const authCode = document.getElementById('gameAuthInput').value;
-
-            if(!authCode) return customAlert('운영자 비밀번호를 입력하세요.', 'error');
-            if(!OPERATOR_CODES[authCode]) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
-
-            let points;
-            if (game && game.isSlot) {
-                const slotVal = parseInt(document.getElementById('slotPointInput').value);
-                if (isNaN(slotVal) || slotVal <= 0) return customAlert('지급할 포인트를 올바르게 입력해주세요.', 'error');
-                if (slotVal > 5000) return customAlert('슬롯머신 최대 지급 포인트는 <b>5,000P</b>입니다.', 'error');
-                points = slotVal;
-            } else {
-                points = parseInt(document.getElementById('tierSelect').value);
-            }
-
-            currentUser.points += points;
-            saveData();
-
-            customAlert(`성공적으로 <b>${points}P</b>가 지급되었습니다!`, 'success');
-            switchTab('home');
-        }
-
-        // --- 🛒 상점 관련 ---
-        function renderShop() {
-            const list = document.getElementById('shopList');
-            list.innerHTML = '';
-
-            SHOP_ITEMS.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'shop-item';
-                
-                const currentStock = localStock[item.id];
-                const isOutOfStock = (item.sellStatus === 0) || (currentStock !== undefined && currentStock <= 0);
-
-                if(isOutOfStock) itemDiv.classList.add('sold-out');
-
-                let infoHtml = `<div class="shop-item-info">`;
-                infoHtml += `<div class="item-name">${item.name}</div>`;
-                
-                if (item.isVariablePrice) {
-                    infoHtml += `<div class="price variable">자율 충전 + 수수료(10%)</div>`;
-                } else {
-                    infoHtml += `<div class="price">${item.price} P</div>`;
-                }
-
-                if (currentStock !== undefined && item.sellStatus === 1) {
-                    const stockClass = currentStock <= 1 ? 'stock-info low' : 'stock-info';
-                    infoHtml += `<div class="${stockClass}">남은 수량: ${currentStock}개</div>`;
-                } else if (item.stock === null && item.sellStatus === 1) {
-                    infoHtml += `<div class="stock-info">무제한 구매 가능</div>`;
-                }
-
-                infoHtml += `</div>`; 
-
-                let actionHtml = `<div>`;
-                if(isOutOfStock) {
-                    actionHtml += `<div class="sold-out-badge">품절</div>`;
-                } else {
-                    actionHtml += `<button class="btn-buy" onclick="buyItem('${item.id}')">구매</button>`;
-                }
-                actionHtml += `</div>`;
-
-                itemDiv.innerHTML = infoHtml + actionHtml;
-                list.appendChild(itemDiv);
-            });
-        }
-
-        function buyItem(itemId) {
-            const item = SHOP_ITEMS.find(i => i.id === itemId);
-
-            if (item.isVariablePrice) {
-                customPrompt(
-                    `<b>[${item.name}]</b><br>게임에 투입할 포인트를 입력하세요.<br><span style="color:#aaa; font-size:0.8rem;">(입력하신 금액의 10%가 수수료로 추가 차감됩니다)</span>`, 
-                    (val) => {
-                        if (val === null) return;
-                        const betAmount = parseInt(val);
-                        if (isNaN(betAmount) || betAmount <= 0) return customAlert('올바른 금액(숫자)을 입력해주세요.', 'error');
-
-                        const fee = Math.round(betAmount * 0.1); 
-                        const totalCost = betAmount + fee; 
-
-                        if (currentUser.points < totalCost) return customAlert(`포인트가 부족합니다!<br><span style="color:#aaa; font-size:0.85rem;">(보유: ${currentUser.points}P / 총 필요: ${totalCost}P)</span>`, 'error');
-
-                        customConfirm(
-                            `<b>[${item.name}]</b><br>
-                            충전 포인트: ${betAmount}P<br>수수료(10%): ${fee}P<br>
-                            <hr style="border:0; border-top:1px dashed #555; margin:15px 0;">
-                            총 결제 금액: <span style="color:#ff3366;">${totalCost}P</span><br><br>결제하시겠습니까?`, 
-                            (isConfirmed) => {
-                                if(isConfirmed) processPurchase(item, totalCost, `${item.name} <span style="color:#00ff88; font-size:0.9em;">(${betAmount}P)</span>`);
-                            }
-                        );
-                    }, 'number', '포인트 입력'
-                );
-                return;
-            }
-
-            if(currentUser.points < item.price) {
-                return customAlert(`포인트가 부족합니다!<br><span style="color:#aaa; font-size:0.85rem;">(현재 보유: ${currentUser.points}P / 필요: ${item.price}P)</span>`, 'error');
-            }
-
-            customConfirm(`<b>[${item.name}]</b><br>상품을 구매하시겠습니까?<br><span style="color:#ff3366;">-${item.price}P</span>`, (isConfirmed) => {
-                if(isConfirmed) processPurchase(item, item.price, item.name);
-            });
-        }
-
-        function processPurchase(item, deductPoints, displayName) {
-            currentUser.points -= deductPoints;
-            
-            if (localStock[item.id] !== undefined) {
-                localStock[item.id] -= 1;
-            }
-
-            currentUser.inventory.push({
-                id: item.id,
-                name: displayName,
-                boughtAt: Date.now()
-            });
-
-            saveData();
-            renderShop(); 
-            
-            customAlert('구매 성공!<br>보관함에서 확인해주세요.', 'success');
-            switchTab('inv');
-        }
-
-        // ==========================================
-        // 🌟 [보관함 관련 - 다중 처리 기능 탑재] 🌟
-        // ==========================================
-        function renderInventory() {
-            const list = document.getElementById('inventoryList');
-            list.innerHTML = '';
-
-            if(currentUser.inventory.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:#777; margin-top:20px;">보관함이 비어있습니다.</p>';
-                return;
-            }
-
-            // 🌟 1. 같은 이름의 아이템 그룹화 🌟
-            currentGroupedInventory = [];
-            currentUser.inventory.forEach((item) => {
-                const existing = currentGroupedInventory.find(g => g.name === item.name);
-                if(existing) {
-                    existing.count++;
-                } else {
-                    currentGroupedInventory.push({ name: item.name, count: 1 });
-                }
-            });
-
-            // 🌟 2. 그룹화된 리스트 렌더링 🌟
-            currentGroupedInventory.forEach((group, groupIndex) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'inv-item';
-                itemDiv.innerHTML = `
-                    <div class="inv-item-name">
-                        ${group.name} 
-                        <span style="color:var(--neon-cyan); margin-left:8px; font-size:1.1em;">x ${group.count}</span>
-                    </div>
-                    <button class="btn-use" onclick="useGroupItem(${groupIndex})">사용</button>
-                `;
-                list.appendChild(itemDiv);
-            });
-        }
-
-        // 🌟 3. 일괄 처리 로직 🌟
-        function useGroupItem(groupIndex) {
-            const group = currentGroupedInventory[groupIndex];
-            const name = group.name;
-            const maxCount = group.count;
-
-            if (maxCount === 1) {
-                // 1개일 때는 수량 묻지 않고 바로 비밀번호 입력
-                customPrompt(`해당 상품(1개)을 사용 처리합니다.<br>운영자 비밀번호 4자리를 입력하세요.`, (pwd) => {
-                    if(pwd === null) return;
-                    if(!OPERATOR_CODES[pwd]) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
-                    
-                    const idx = currentUser.inventory.findIndex(i => i.name === name);
-                    if(idx > -1) currentUser.inventory.splice(idx, 1);
-                    
-                    saveData();
-                    customAlert('정상 처리되었습니다.', 'success');
-                });
-            } else {
-                // 2개 이상일 때는 '몇 개 쓸 건지' 먼저 묻기
-                customPrompt(`보유 수량: <b>${maxCount}개</b><br><br>몇 개를 사용하시겠습니까?`, (qtyStr) => {
-                    if(qtyStr === null) return;
-                    const qty = parseInt(qtyStr);
-                    
-                    if(isNaN(qty) || qty <= 0 || qty > maxCount) {
-                        return customAlert(`1에서 ${maxCount} 사이의 올바른 수량을 입력하세요.`, 'error');
-                    }
-                    
-                    // 수량 입력 완료 후 약간의 딜레이(애니메이션) 대기 후 비밀번호 묻기
-                    setTimeout(() => {
-                        customPrompt(`<b>${qty}개</b> 사용 처리합니다.<br>운영자 비밀번호 4자리를 입력하세요.`, (pwd) => {
-                            if(pwd === null) return;
-                            if(!OPERATOR_CODES[pwd]) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
-                            
-                            // 입력한 수량만큼 배열에서 찾아서 삭제
-                            for(let i = 0; i < qty; i++) {
-                                const idx = currentUser.inventory.findIndex(item => item.name === name);
-                                if(idx > -1) currentUser.inventory.splice(idx, 1);
-                            }
-                            
-                            saveData();
-                            customAlert(`총 ${qty}개가 정상 처리되었습니다.`, 'success');
-                        });
-                    }, 400); 
-                }, 'number', '사용할 수량 입력');
-            }
-        }
-    </script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

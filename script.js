@@ -1,7 +1,5 @@
-
-
 // =========================================================================
-// 2. 🌟 글로벌 변수 및 모달(팝업) 시스템
+// 🌟 글로벌 변수 및 모달(팝업) 시스템
 // =========================================================================
 let currentUser = null;
 let localStock = {}; 
@@ -137,11 +135,14 @@ function customSliderPrompt(message, maxCount, callback) {
 }
 
 // =========================================================================
-// 3. 🌟 로그인, 로그아웃 및 상태 관리
+// 🌟 로그인, 로그아웃 및 상태 관리
 // =========================================================================
 window.onload = () => {
-    initGameOptions();
-    checkAutoLogin();
+    // 앱이 정상적으로 로딩되면 실행
+    if(document.getElementById('loginOverlay')) {
+        initGameOptions();
+        checkAutoLogin();
+    }
 };
 
 function checkAutoLogin() {
@@ -150,8 +151,7 @@ function checkAutoLogin() {
     
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        if(!currentUser.logs) currentUser.logs = []; // 로그 배열 초기화 보장
-        
+        if(!currentUser.logs) currentUser.logs = []; 
         if(savedStock) localStock = JSON.parse(savedStock);
         else initLocalStock();
         
@@ -253,14 +253,13 @@ function switchTab(tabName) {
     document.getElementById('nav-' + tabName).classList.add('active');
     document.getElementById('gameAuthInput').value = '';
     
-    // 기록 탭을 눌렀을 때만 로그 렌더링 호출
     if (tabName === 'logs') {
         renderLogs();
     }
 }
 
 // =========================================================================
-// 4. 🎮 게임 점수 부여 및 기록
+// 🎮 게임 점수 부여 및 기록
 // =========================================================================
 function initGameOptions() {
     const gameSelect = document.getElementById('gameSelect');
@@ -308,7 +307,6 @@ function giveGamePoints() {
 
     if(!authCode) return customAlert('운영자 비밀번호를 입력하세요.', 'error');
     
-    // 관리자 이름 식별
     const adminName = OPERATOR_CODES[authCode];
     if(!adminName) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
 
@@ -324,7 +322,6 @@ function giveGamePoints() {
 
     currentUser.points += points;
     
-    // 🌟 로그(기록) 남기기
     currentUser.logs = currentUser.logs || [];
     currentUser.logs.push({
         type: '점수 획득',
@@ -341,7 +338,7 @@ function giveGamePoints() {
 }
 
 // =========================================================================
-// 5. 🛒 상점 & 🎒 보관함 시스템
+// 🛒 상점 & 🎒 보관함 시스템
 // =========================================================================
 function renderShop() {
     const list = document.getElementById('shopList');
@@ -497,7 +494,6 @@ function useGroupItem(groupIndex) {
             const idx = currentUser.inventory.findIndex(i => i.name === name);
             if(idx > -1) currentUser.inventory.splice(idx, 1);
             
-            // 🌟 로그 추가
             currentUser.logs = currentUser.logs || [];
             currentUser.logs.push({
                 type: '상품 사용',
@@ -524,7 +520,6 @@ function useGroupItem(groupIndex) {
                         if(idx > -1) currentUser.inventory.splice(idx, 1);
                     }
                     
-                    // 🌟 로그 추가
                     currentUser.logs = currentUser.logs || [];
                     currentUser.logs.push({
                         type: '상품 사용',
@@ -542,7 +537,7 @@ function useGroupItem(groupIndex) {
 }
 
 // =========================================================================
-// 6. 📜 활동 로그 렌더링
+// 📜 활동 로그 렌더링
 // =========================================================================
 function renderLogs() {
     const list = document.getElementById('logList');
@@ -554,7 +549,6 @@ function renderLogs() {
         return;
     }
 
-    // 최신 기록이 맨 위로 오도록 배열을 복사하여 역순정렬
     [...currentUser.logs].reverse().forEach(log => {
         const logDiv = document.createElement('div');
         logDiv.className = 'inv-item'; 
@@ -575,7 +569,7 @@ function renderLogs() {
 }
 
 // =========================================================================
-// 7. 🛠️ 최고 관리자 패널
+// 🛠️ 최고 관리자 패널
 // =========================================================================
 function openAdminPanel() {
     if (currentUser && currentUser.isAdmin) {
@@ -626,7 +620,6 @@ function adminAdjustPoints() {
 
         currentUser.points += pts;
 
-        // 강제 조작도 로그에 남김
         currentUser.logs = currentUser.logs || [];
         currentUser.logs.push({
             type: '강제 조작',

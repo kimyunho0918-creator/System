@@ -16,10 +16,12 @@ const GAMES = [
         id: 'game1', 
         name: '⌨️ 가게 운영 시뮬레이션',
         tiers: [
-            { name: '적자 (참가상)', points: 50 },
-            { name: '본전 치기', points: 100 },
-            { name: '흑자 달성', points: 300 },
-            { name: '초대박 맛집 등극', points: 500 }
+            { name: '💀 빚더미 파산', points: 100 },
+            { name: '😥 눈물의 폐업', points: 300 },
+            { name: '💼 훌륭한 방어전', points: 500 },
+            { name: '🌟 골목 상권의 지배자', points: 1000 },
+            { name: '🔥 프랜차이즈 대표', points: 1500 },
+            { name: '👑 장사의 신', points: 2000 }
         ]
     },
     { 

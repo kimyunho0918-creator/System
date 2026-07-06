@@ -1,11 +1,10 @@
 // =========================================================================
-// 🌟 글로벌 변수 및 모달(팝업) 시스템
+// 1. 🌟 글로벌 변수 및 모달(팝업) 시스템
 // =========================================================================
 let currentUser = null;
 let localStock = {}; 
 let currentGroupedInventory = []; 
 
-// 엔터키 지원 함수
 function handleLoginEnter(e) {
     if (e.key === 'Enter') login();
 }
@@ -66,6 +65,8 @@ function customPrompt(message, callback, inputType = 'password', placeholder = '
     
     document.getElementById('modalTitle').className = 'modal-title ' + (inputType === 'password' ? 'error' : 'info');
     document.getElementById('modalTitle').innerText = inputType === 'password' ? '🔐 운영자 인증' : '💸 수량/금액 입력';
+    if (inputType === 'text' && placeholder.includes('코드')) document.getElementById('modalTitle').innerText = '🔑 쿠폰 코드 입력';
+    
     document.getElementById('modalMessage').innerHTML = message;
     
     inputElem.type = inputType;
@@ -75,7 +76,6 @@ function customPrompt(message, callback, inputType = 'password', placeholder = '
     
     confirmBtn.className = 'modal-btn confirm ' + (inputType === 'password' ? 'danger' : ''); 
     
-    // 모달창 엔터키 지원
     inputElem.onkeypress = (e) => {
         if(e.key === 'Enter') confirmBtn.click();
     };
@@ -134,15 +134,32 @@ function customSliderPrompt(message, maxCount, callback) {
     document.getElementById('customModal').classList.add('active');
 }
 
+// 쿠폰 코드 해제 함수
+function promptSecretCode() {
+    if (isSlotUnlocked) {
+        return customAlert('이미 숨겨진 상점이 해제되어 있습니다!', 'info');
+    }
+    
+    customPrompt(`<b>쿠폰 입력</b><br>특수 코드를 입력하세요.`, (val) => {
+        if (val === null) return; 
+        
+        if (val === SECRET_UNLOCK_CODE) { 
+            isSlotUnlocked = true;
+            localStorage.setItem('isSlotUnlocked', 'true');
+            renderShop(); 
+            customAlert('🎰 슬롯머신 항목이 해제되었습니다!', 'success');
+        } else {
+            customAlert('잘못된 코드입니다.', 'error');
+        }
+    }, 'text', '쿠폰 코드 입력');
+}
+
 // =========================================================================
-// 🌟 로그인, 로그아웃 및 상태 관리
+// 2. 🌟 로그인, 로그아웃 및 상태 관리
 // =========================================================================
 window.onload = () => {
-    // 앱이 정상적으로 로딩되면 실행
-    if(document.getElementById('loginOverlay')) {
-        initGameOptions();
-        checkAutoLogin();
-    }
+    initGameOptions();
+    checkAutoLogin();
 };
 
 function checkAutoLogin() {
@@ -151,7 +168,6 @@ function checkAutoLogin() {
     
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        if(!currentUser.logs) currentUser.logs = []; 
         if(savedStock) localStock = JSON.parse(savedStock);
         else initLocalStock();
         
@@ -193,7 +209,6 @@ function login() {
             currentUser.name = name; 
             currentUser.isAdmin = isAdminAccount; 
             if(!currentUser.inventory) currentUser.inventory = []; 
-            if(!currentUser.logs) currentUser.logs = [];
             if(savedStock) localStock = JSON.parse(savedStock);
             else initLocalStock();
             
@@ -201,14 +216,14 @@ function login() {
         } else {
             customConfirm(`이전에 로그인한 기록([${parsedUser.studentId}] ${parsedUser.name})이 있습니다.<br><br><span style="color:#ff3366;">새로운 학번으로 로그인하면 기존 포인트와 보관함이 모두 삭제됩니다.</span><br>진행하시겠습니까?`, (ok) => {
                 if(ok) {
-                    currentUser = { studentId: id, name: name, points: 0, inventory: [], logs: [], isAdmin: isAdminAccount };
+                    currentUser = { studentId: id, name: name, points: 0, inventory: [], isAdmin: isAdminAccount };
                     initLocalStock();
                     finishLogin();
                 }
             });
         }
     } else {
-        currentUser = { studentId: id, name: name, points: 0, inventory: [], logs: [], isAdmin: isAdminAccount };
+        currentUser = { studentId: id, name: name, points: 0, inventory: [], isAdmin: isAdminAccount };
         initLocalStock();
         finishLogin();
     }
@@ -252,14 +267,10 @@ function switchTab(tabName) {
     document.getElementById('view-' + tabName).classList.add('active');
     document.getElementById('nav-' + tabName).classList.add('active');
     document.getElementById('gameAuthInput').value = '';
-    
-    if (tabName === 'logs') {
-        renderLogs();
-    }
 }
 
 // =========================================================================
-// 🎮 게임 점수 부여 및 기록
+// 3. 🎮 게임 점수 부여 및 관리자 모드
 // =========================================================================
 function initGameOptions() {
     const gameSelect = document.getElementById('gameSelect');
@@ -296,6 +307,16 @@ function updateTierOptions() {
             opt.innerText = `${tier.name} (+ ${tier.points}P)`;
             tierSelect.appendChild(opt);
         });
+    } else {
+        tierSelect.style.display = 'block';
+        slotWrap.style.display = 'none';
+        for(let i = 1; i <= 10; i++) {
+            let points = i * 100;
+            let opt = document.createElement('option');
+            opt.value = points;
+            opt.innerText = i + '단계 성공 (+ ' + points + 'P)';
+            tierSelect.appendChild(opt);
+        }
     }
 }
 
@@ -306,9 +327,7 @@ function giveGamePoints() {
     const authCode = document.getElementById('gameAuthInput').value;
 
     if(!authCode) return customAlert('운영자 비밀번호를 입력하세요.', 'error');
-    
-    const adminName = OPERATOR_CODES[authCode];
-    if(!adminName) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
+    if(!OPERATOR_CODES[authCode]) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
 
     let points;
     if (game && game.isSlot) {
@@ -321,24 +340,70 @@ function giveGamePoints() {
     }
 
     currentUser.points += points;
-    
-    currentUser.logs = currentUser.logs || [];
-    currentUser.logs.push({
-        type: '점수 획득',
-        admin: adminName,
-        detail: `${game.name} - ${points}P 지급`,
-        time: new Date().toLocaleString()
-    });
-
     saveData();
     document.getElementById('gameAuthInput').value = '';
     
-    customAlert(`<b>${adminName}</b> 승인 완료!<br><b>${points}P</b>가 지급되었습니다!`, 'success');
+    customAlert(`성공적으로 <b>${points}P</b>가 지급되었습니다!`, 'success');
     switchTab('home');
 }
 
+function openAdminPanel() {
+    if (currentUser && currentUser.isAdmin) {
+        document.getElementById('adminOverlay').classList.add('active');
+    } else {
+        customPrompt(`최고 관리자(부장) 전용 메뉴입니다.<br>비밀번호 4자리를 입력하세요.`, (pwd) => {
+            if(pwd === null) return;
+            if(pwd === '7777' || pwd === '0918') { 
+                document.getElementById('adminOverlay').classList.add('active');
+            } else {
+                customAlert('최고 관리자 권한이 없습니다.', 'error');
+            }
+        });
+    }
+}
+
+function closeAdminPanel() {
+    document.getElementById('adminOverlay').classList.remove('active');
+}
+
+function adminResetUser() {
+    customConfirm('현재 기기의 데이터와 보관함을 지우고 완전 초기화하시겠습니까?<br><span style="color:#ff3366; font-size:0.85rem;">(복구 불가능)</span>', (ok) => {
+        if(ok) {
+            localStorage.removeItem('festivalUser');
+            localStorage.removeItem('festivalStock');
+            location.reload(); 
+        }
+    });
+}
+
+function adminResetStock() {
+    customConfirm('이 기기의 모든 상품 개인 재고를 초기 횟수로 복구하시겠습니까?', (ok) => {
+        if(ok) {
+            initLocalStock();
+            renderShop();
+            saveData();
+            closeAdminPanel();
+            customAlert('재고가 완벽하게 복구되었습니다.', 'success');
+        }
+    });
+}
+
+function adminAdjustPoints() {
+    customPrompt('부여할 포인트를 입력하세요.<br><span style="color:#aaa; font-size:0.8rem;">(차감 시 숫자 앞에 - 를 붙이세요)</span>', (val) => {
+        if(val === null) return;
+        const pts = parseInt(val);
+        if(isNaN(pts)) return customAlert('올바른 숫자를 입력해주세요.', 'error');
+
+        currentUser.points += pts;
+        saveData();
+        closeAdminPanel();
+        customAlert(`성공적으로 <b>${pts}P</b>가 강제 적용되었습니다.`, 'success');
+    }, 'number', '포인트 조작');
+}
+
+
 // =========================================================================
-// 🛒 상점 & 🎒 보관함 시스템
+// 4. 🛒 상점 & 🎒 보관함 시스템
 // =========================================================================
 function renderShop() {
     const list = document.getElementById('shopList');
@@ -346,6 +411,9 @@ function renderShop() {
     list.innerHTML = '';
 
     SHOP_ITEMS.forEach(item => {
+        // 숨김 아이템(슬롯머신)이고 잠금이 안 풀렸으면 렌더링하지 않음
+        if (item.isHidden && !isSlotUnlocked) return; 
+
         const itemDiv = document.createElement('div');
         itemDiv.className = 'shop-item';
         
@@ -488,22 +556,13 @@ function useGroupItem(groupIndex) {
     if (maxCount === 1) {
         customPrompt(`해당 상품(1개)을 사용 처리합니다.<br>운영자 비밀번호 4자리를 입력하세요.`, (pwd) => {
             if(pwd === null) return;
-            const adminName = OPERATOR_CODES[pwd];
-            if(!adminName) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
+            if(!OPERATOR_CODES[pwd]) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
             
             const idx = currentUser.inventory.findIndex(i => i.name === name);
             if(idx > -1) currentUser.inventory.splice(idx, 1);
             
-            currentUser.logs = currentUser.logs || [];
-            currentUser.logs.push({
-                type: '상품 사용',
-                admin: adminName,
-                detail: `${name} x1개 사용 승인`,
-                time: new Date().toLocaleString()
-            });
-
             saveData();
-            customAlert(`<b>${adminName}</b> 승인으로 사용 처리되었습니다.`, 'success');
+            customAlert('정상 처리되었습니다.', 'success');
         });
     } else {
         customSliderPrompt(`보유 수량: <b>${maxCount}개</b><br><br>사용할 수량을 스크롤하여 선택하세요.`, maxCount, (qty) => {
@@ -512,124 +571,17 @@ function useGroupItem(groupIndex) {
             setTimeout(() => {
                 customPrompt(`<b>${qty}개</b> 사용 처리합니다.<br>운영자 비밀번호 4자리를 입력하세요.`, (pwd) => {
                     if(pwd === null) return;
-                    const adminName = OPERATOR_CODES[pwd];
-                    if(!adminName) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
+                    if(!OPERATOR_CODES[pwd]) return customAlert('관리자 비밀번호가 틀렸습니다.', 'error');
                     
                     for(let i = 0; i < qty; i++) {
                         const idx = currentUser.inventory.findIndex(item => item.name === name);
                         if(idx > -1) currentUser.inventory.splice(idx, 1);
                     }
                     
-                    currentUser.logs = currentUser.logs || [];
-                    currentUser.logs.push({
-                        type: '상품 사용',
-                        admin: adminName,
-                        detail: `${name} x${qty}개 사용 승인`,
-                        time: new Date().toLocaleString()
-                    });
-
                     saveData();
-                    customAlert(`<b>${adminName}</b> 승인으로 총 ${qty}개가 처리되었습니다.`, 'success');
+                    customAlert(`총 ${qty}개가 정상 처리되었습니다.`, 'success');
                 });
             }, 400); 
         });
     }
-}
-
-// =========================================================================
-// 📜 활동 로그 렌더링
-// =========================================================================
-function renderLogs() {
-    const list = document.getElementById('logList');
-    if(!list) return;
-    list.innerHTML = '';
-    
-    if(!currentUser.logs || currentUser.logs.length === 0) {
-        list.innerHTML = '<p style="text-align:center; color:#777; margin-top:20px;">기록이 없습니다.</p>';
-        return;
-    }
-
-    [...currentUser.logs].reverse().forEach(log => {
-        const logDiv = document.createElement('div');
-        logDiv.className = 'inv-item'; 
-        logDiv.style.flexDirection = 'column';
-        logDiv.style.alignItems = 'flex-start';
-        logDiv.style.gap = '5px';
-        
-        logDiv.innerHTML = `
-            <div style="display:flex; justify-content:space-between; width:100%;">
-                <span style="color:var(--neon-cyan); font-weight:bold;">[${log.type}]</span>
-                <span style="color:#888; font-size:0.75rem;">${log.time}</span>
-            </div>
-            <div style="color:#eee; font-size:0.95rem;">${log.detail}</div>
-            <div style="color:var(--neon-green); font-size:0.85rem; font-weight:bold;">승인 관리자: ${log.admin}</div>
-        `;
-        list.appendChild(logDiv);
-    });
-}
-
-// =========================================================================
-// 🛠️ 최고 관리자 패널
-// =========================================================================
-function openAdminPanel() {
-    if (currentUser && currentUser.isAdmin) {
-        document.getElementById('adminOverlay').classList.add('active');
-    } else {
-        customPrompt(`최고 관리자(부장) 전용 메뉴입니다.<br>비밀번호 4자리를 입력하세요.`, (pwd) => {
-            if(pwd === null) return;
-            if(pwd === '7777') { 
-                document.getElementById('adminOverlay').classList.add('active');
-            } else {
-                customAlert('최고 관리자 권한이 없습니다.', 'error');
-            }
-        });
-    }
-}
-
-function closeAdminPanel() {
-    document.getElementById('adminOverlay').classList.remove('active');
-}
-
-function adminResetUser() {
-    customConfirm('현재 기기의 데이터와 보관함을 지우고 완전 초기화하시겠습니까?<br><span style="color:#ff3366; font-size:0.85rem;">(복구 불가능)</span>', (ok) => {
-        if(ok) {
-            localStorage.removeItem('festivalUser');
-            localStorage.removeItem('festivalStock');
-            location.reload(); 
-        }
-    });
-}
-
-function adminResetStock() {
-    customConfirm('이 기기의 모든 상품 개인 재고를 초기 횟수로 복구하시겠습니까?', (ok) => {
-        if(ok) {
-            initLocalStock();
-            renderShop();
-            saveData();
-            closeAdminPanel();
-            customAlert('재고가 완벽하게 복구되었습니다.', 'success');
-        }
-    });
-}
-
-function adminAdjustPoints() {
-    customPrompt('부여할 포인트를 입력하세요.<br><span style="color:#aaa; font-size:0.8rem;">(차감 시 숫자 앞에 - 를 붙이세요)</span>', (val) => {
-        if(val === null) return;
-        const pts = parseInt(val);
-        if(isNaN(pts)) return customAlert('올바른 숫자를 입력해주세요.', 'error');
-
-        currentUser.points += pts;
-
-        currentUser.logs = currentUser.logs || [];
-        currentUser.logs.push({
-            type: '강제 조작',
-            admin: '부장(최고관리자)',
-            detail: `포인트 ${pts}P 강제 적용`,
-            time: new Date().toLocaleString()
-        });
-
-        saveData();
-        closeAdminPanel();
-        customAlert(`성공적으로 <b>${pts}P</b>가 강제 적용되었습니다.`, 'success');
-    }, 'number', '포인트 조작');
 }

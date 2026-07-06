@@ -80,9 +80,7 @@
 
         <div id="view-shop" class="view-section">
             <h3 style="text-align: center; color: #ff9900;">상점 (보유: <span id="shopPointDisplay" style="color:#00ff88;">0</span>P)</h3>
-            
             <button onclick="promptSecretCode()" style="background: #252535; border: 1px dashed #00e5ff; color: #00e5ff; padding: 8px; font-size: 0.85rem; margin-bottom: 15px; border-radius: 8px; box-shadow: none;">🎟️ 쿠폰 코드 입력하기</button>
-
             <p style="text-align: center; font-size: 0.8rem; color: #888;">원하시는 상품을 구매하시면 보관함으로 이동합니다.</p>
             <div class="shop-list" id="shopList"></div>
         </div>
@@ -92,13 +90,22 @@
             <p style="text-align: center; font-size: 0.8rem; color: #888;">상품 수령 시 운영자에게 보여주고 '사용'을 눌러주세요.</p>
             <div class="inventory-list" id="inventoryList"></div>
         </div>
+
+        <!-- 새롭게 추가된 기록 탭 화면 -->
+        <div id="view-history" class="view-section">
+            <h3 style="text-align: center; color: #b44fff;">📜 이용 기록</h3>
+            <p style="text-align: center; font-size: 0.8rem; color: #888;">점수 획득 및 상점 이용 내역이 표시됩니다.</p>
+            <div class="history-list" id="historyList"></div>
+        </div>
     </div>
 
+    <!-- 하단 메뉴에 기록(History) 탭 1개 추가 -->
     <div class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home')" id="nav-home">🏠 홈</div>
-        <div class="nav-item" onclick="switchTab('game')" id="nav-game">🎮 점수입력</div>
+        <div class="nav-item" onclick="switchTab('game')" id="nav-game">🎮 점수</div>
         <div class="nav-item" onclick="switchTab('shop')" id="nav-shop">🛒 상점</div>
         <div class="nav-item" onclick="switchTab('inv')" id="nav-inv">🎒 보관함</div>
+        <div class="nav-item" onclick="switchTab('history')" id="nav-history">📜 기록</div>
     </div>
 
     <script src="config.js"></script>

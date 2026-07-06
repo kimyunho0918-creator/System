@@ -134,15 +134,12 @@ function customSliderPrompt(message, maxCount, callback) {
     document.getElementById('customModal').classList.add('active');
 }
 
-// 쿠폰 코드 해제 함수
 function promptSecretCode() {
     if (isSlotUnlocked) {
         return customAlert('이미 숨겨진 상점이 해제되어 있습니다!', 'info');
     }
-    
     customPrompt(`<b>쿠폰 입력</b><br>특수 코드를 입력하세요.`, (val) => {
         if (val === null) return; 
-        
         if (val === SECRET_UNLOCK_CODE) { 
             isSlotUnlocked = true;
             localStorage.setItem('isSlotUnlocked', 'true');
@@ -155,7 +152,7 @@ function promptSecretCode() {
 }
 
 // =========================================================================
-// 2. 🌟 로그인, 로그아웃 및 상태 관리
+// 2. 🌟 로그인, 로그아웃, 상태 관리 및 "기록(History)" 처리
 // =========================================================================
 window.onload = () => {
     initGameOptions();
@@ -172,6 +169,7 @@ function checkAutoLogin() {
         else initLocalStock();
         
         currentUser.isAdmin = (currentUser.studentId === '30109' && currentUser.name === '김윤호');
+        if(!currentUser.history) currentUser.history = []; // 기록 배열 확인
         
         document.getElementById('loginOverlay').style.display = 'none';
         renderShop();
@@ -209,6 +207,7 @@ function login() {
             currentUser.name = name; 
             currentUser.isAdmin = isAdminAccount; 
             if(!currentUser.inventory) currentUser.inventory = []; 
+            if(!currentUser.history) currentUser.history = []; // 기록 배열 확인
             if(savedStock) localStock = JSON.parse(savedStock);
             else initLocalStock();
             
@@ -216,14 +215,14 @@ function login() {
         } else {
             customConfirm(`이전에 로그인한 기록([${parsedUser.studentId}] ${parsedUser.name})이 있습니다.<br><br><span style="color:#ff3366;">새로운 학번으로 로그인하면 기존 포인트와 보관함이 모두 삭제됩니다.</span><br>진행하시겠습니까?`, (ok) => {
                 if(ok) {
-                    currentUser = { studentId: id, name: name, points: 0, inventory: [], isAdmin: isAdminAccount };
+                    currentUser = { studentId: id, name: name, points: 0, inventory: [], history: [], isAdmin: isAdminAccount };
                     initLocalStock();
                     finishLogin();
                 }
             });
         }
     } else {
-        currentUser = { studentId: id, name: name, points: 0, inventory: [], isAdmin: isAdminAccount };
+        currentUser = { studentId: id, name: name, points: 0, inventory: [], history: [], isAdmin: isAdminAccount };
         initLocalStock();
         finishLogin();
     }
@@ -259,6 +258,7 @@ function updateUI() {
     document.getElementById('shopPointDisplay').innerText = currentUser.points;
     document.getElementById('adminBtn').style.display = currentUser.isAdmin ? 'block' : 'none';
     renderInventory(); 
+    renderHistory(); // 기록 화면 업데이트
 }
 
 function switchTab(tabName) {
@@ -267,6 +267,49 @@ function switchTab(tabName) {
     document.getElementById('view-' + tabName).classList.add('active');
     document.getElementById('nav-' + tabName).classList.add('active');
     document.getElementById('gameAuthInput').value = '';
+}
+
+// === [기록 저장 함수] ===
+function addHistory(actionText, authCode = null) {
+    if (!currentUser.history) currentUser.history = [];
+    
+    let adminName = null;
+    if (authCode && OPERATOR_CODES[authCode]) {
+        adminName = OPERATOR_CODES[authCode]; // 입력된 비번으로 관리자 식별
+    }
+
+    currentUser.history.unshift({
+        time: Date.now(),
+        action: actionText,
+        admin: adminName
+    });
+}
+
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    if(!list) return;
+    list.innerHTML = '';
+
+    if(!currentUser.history || currentUser.history.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:#777; margin-top:20px;">이용 내역이 없습니다.</p>';
+        return;
+    }
+
+    currentUser.history.forEach(log => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'history-item';
+        
+        const date = new Date(log.time);
+        const timeStr = `${date.getMonth()+1}/${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+        
+        let html = `<div class="time">${timeStr}</div>`;
+        html += `<div class="log-text">${log.action}</div>`;
+        if (log.admin) {
+            html += `<div style="margin-top: 6px; font-size: 0.8rem; color: #888;">담당 처리: <span class="admin-name">승인자 [${log.admin}]</span></div>`;
+        }
+        itemDiv.innerHTML = html;
+        list.appendChild(itemDiv);
+    });
 }
 
 // =========================================================================
@@ -300,7 +343,6 @@ function updateTierOptions() {
     } else if (game && game.tiers) {
         tierSelect.style.display = 'block';
         slotWrap.style.display = 'none';
-        
         game.tiers.forEach(tier => {
             let opt = document.createElement('option');
             opt.value = tier.points;
@@ -340,6 +382,9 @@ function giveGamePoints() {
     }
 
     currentUser.points += points;
+    // 기록 남기기 (게임 명칭과 지급 포인트, 그리고 승인한 관리자 비밀번호를 함께 전달)
+    addHistory(`🎮 게임 [${game.name}] 완료 (+ ${points}P)`, authCode);
+
     saveData();
     document.getElementById('gameAuthInput').value = '';
     
@@ -395,6 +440,7 @@ function adminAdjustPoints() {
         if(isNaN(pts)) return customAlert('올바른 숫자를 입력해주세요.', 'error');
 
         currentUser.points += pts;
+        addHistory(`⚙️ 강제 포인트 조정 (${pts > 0 ? '+' : ''}${pts}P)`, '0918'); // 임의로 최고관리자 기록으로 남김
         saveData();
         closeAdminPanel();
         customAlert(`성공적으로 <b>${pts}P</b>가 강제 적용되었습니다.`, 'success');
@@ -411,7 +457,6 @@ function renderShop() {
     list.innerHTML = '';
 
     SHOP_ITEMS.forEach(item => {
-        // 숨김 아이템(슬롯머신)이고 잠금이 안 풀렸으면 렌더링하지 않음
         if (item.isHidden && !isSlotUnlocked) return; 
 
         const itemDiv = document.createElement('div');
@@ -511,6 +556,9 @@ function processPurchase(item, deductPoints, displayName, qty = 1) {
         currentUser.inventory.push({ id: item.id, name: displayName, boughtAt: Date.now() });
     }
 
+    // 기록 남기기 (상점 구매는 학생이 직접 구매하므로 관리자 이름 미표기)
+    addHistory(`🛒 상점 구매: ${item.name} ${qty}개 (- ${deductPoints}P)`);
+
     saveData();
     renderShop(); 
     customAlert(`구매 성공! (${qty}개)<br>보관함에서 확인해주세요.`, 'success');
@@ -561,6 +609,9 @@ function useGroupItem(groupIndex) {
             const idx = currentUser.inventory.findIndex(i => i.name === name);
             if(idx > -1) currentUser.inventory.splice(idx, 1);
             
+            // 사용 기록 남기기 (입력받은 비밀번호를 전달하여 관리자 식별)
+            addHistory(`🎒 상품 사용 완료: ${name} 1개`, pwd);
+
             saveData();
             customAlert('정상 처리되었습니다.', 'success');
         });
@@ -578,6 +629,9 @@ function useGroupItem(groupIndex) {
                         if(idx > -1) currentUser.inventory.splice(idx, 1);
                     }
                     
+                    // 사용 기록 남기기
+                    addHistory(`🎒 상품 사용 완료: ${name} ${qty}개`, pwd);
+
                     saveData();
                     customAlert(`총 ${qty}개가 정상 처리되었습니다.`, 'success');
                 });

@@ -67,5 +67,10 @@ const SHOP_ITEMS = [
     { id: 'item2', name: '🐻 하리보 젤리', price: 800, stock: 3, sellStatus: 1 },        
     { id: 'item3', name: '🧃 탄산 음료수', price: 1500, stock: 2, sellStatus: 1 },        
     { id: 'item4', name: '🍦 아이스크림', price: 3000, stock: 1, sellStatus: 1 },        
-    { id: 'item6', name: '🎰 슬롯머신 이용권', price: 0, stock: 3, sellStatus: 1, isVariablePrice: true } 
+    // 슬롯머신 숨김 처리 (isHidden: true)
+    { id: 'item6', name: '🎰 슬롯머신 이용권', price: 0, stock: 3, sellStatus: 1, isVariablePrice: true, isHidden: true } 
 ];
+
+// 🌟 히든 상점 (슬롯머신) 해제용 글로벌 변수 설정 🌟
+let isSlotUnlocked = localStorage.getItem('isSlotUnlocked') === 'true';
+const SECRET_UNLOCK_CODE = "1336";

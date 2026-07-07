@@ -41,10 +41,11 @@ const GAMES = [
         id: 'game3', 
         name: '🎯 모의 주식',
         tiers: [
-            { name: '상장폐지 (참가상)', points: 50 },
-            { name: '원금 방어', points: 150 },
-            { name: '수익 달성', points: 300 },
-            { name: '상한가 (떡상)', points: 600 }
+            { name: '한강 지망생', points: 100},
+            { name: '본전 개미', points: 300 },
+            { name: '성공한 투자자', points: 500 },
+            { name: '워렌 버핏', points: 1000 },
+            { name: '주식의 신', points: 3000 }
         ]
     },
     { 

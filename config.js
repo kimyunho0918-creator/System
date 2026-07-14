@@ -30,11 +30,16 @@ const GAMES = [
     },
     { 
         id: 'game2', 
-        name: '💡 역전 재판',
+        name: '🔨 학교 강화하기',
         tiers: [
-            { name: '패소 (참가상)', points: 50 },
-            { name: '일부 승소', points: 200 },
-            { name: '완벽한 무죄 판결', points: 500 }
+            { name: '1강 ~ 5강', points: 100 },
+            { name: '6강 ~ 10강', points: 500 },
+            { name: '11강 ~ 15강', points: 1500 },
+            { name: '16강', points: 2000},
+            { name: '17강', points: 3000},
+            { name: '18강', points: 4000},
+            { name: '19강', points: 5000},
+            { name: '20강', points: 10000}
         ]
     },
     { 

@@ -73,8 +73,10 @@ const GAMES = [
 
 const SHOP_ITEMS = [
     { id: 'item1', name: '🍬 마이쮸', price: 1000, stock: 5, sellStatus: 1 },                
+    { id: 'item2', name: '🧃 음료수',price:3000, stock: 1, sellStatus: 1},
     { id: 'item3', name: '🍦 아이스크림', price: 6000, stock: 1, sellStatus: 1 },        
-    { id: 'item4', name: '🧃 탄산 음료수', price: 9000 , stock: 1, sellStatus: 1 },        
+    { id: 'item4', name: '🥤 탄산 음료수', price: 9000 , stock: 1, sellStatus: 1 },
+    
     // 슬롯머신 숨김 처리 (isHidden: true)
     { id: 'item6', name: '🎰 슬롯머신 이용권', price: 0, stock: 3, sellStatus: 1, isVariablePrice: true, isHidden: true } 
 ];

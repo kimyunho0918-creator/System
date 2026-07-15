@@ -75,10 +75,11 @@ const GAMES = [
             { name: '올림픽 신기록', points: 1000 }
         ]
     },
+    // 👇 수정한 부분: ID 중복(game4)을 game6으로 해결하고, 자율입력을 명시했습니다.
     { 
-        id: 'game4', 
-        name: '🏢 타워 디펜스',
-        isSlot: true
+        id: 'game6', 
+        name: '🏢 타워 디펜스 (자율입력)', 
+        isSlot: true 
     },
     { 
         id: 'game_slot', 

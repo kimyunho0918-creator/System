@@ -55,7 +55,29 @@ const GAMES = [
     },
     { 
         id: 'game4', 
-        name: '🏃 미니 올림픽',
+        name: '❄️ 얼불춤 🔥',
+        tiers: [
+            { name: '참가상', points: 50 },
+            { name: '동메달', points: 200 },
+            { name: '은메달', points: 400 },
+            { name: '금메달', points: 700 },
+            { name: '올림픽 신기록', points: 1000 }
+        ]
+    },
+    { 
+        id: 'game5', 
+        name: '🌛 여기가 안방이야?!',
+        tiers: [
+            { name: '참가상', points: 50 },
+            { name: '동메달', points: 200 },
+            { name: '은메달', points: 400 },
+            { name: '금메달', points: 700 },
+            { name: '올림픽 신기록', points: 1000 }
+        ]
+    },
+    { 
+        id: 'game4', 
+        name: '🏢 타워 디펜스',
         tiers: [
             { name: '참가상', points: 50 },
             { name: '동메달', points: 200 },
